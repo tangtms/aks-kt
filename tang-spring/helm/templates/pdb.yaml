@@ -1,0 +1,14 @@
+{{- $minAvailable := .Values.pdb.minAvailable -}}
+  {{- if .Values.pdb.enabled -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    {{- include "tang-spring-helm.labels" . | nindent 4 }}
+  name: {{ include "tang-spring-helm.fullname" .}}
+spec:
+  minAvailable: {{ $minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "tang-spring-helm.selectorLabels" . | nindent 6 }}
+  {{- end }}

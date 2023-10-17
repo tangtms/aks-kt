@@ -1,0 +1,91 @@
+# Default values for our project.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: enablementacrnonprod.azurecr.io/tang-spring-helm
+  pullPolicy: Always
+  tag:
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  #  name:
+topologySpreadConstraints:
+  avaliableZone:
+    maxSkew: 1
+    topologyKey: "topology.kubernetes.io/zone"
+    whenUnsatisfiable: ScheduleAnyway
+  nodes:
+    maxSkew: 1
+    topologyKey: "kubernetes.io/hostname"
+    whenUnsatisfiable: ScheduleAnyway
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+ingress:
+  # Whether deployment Ingress resource into AKS cluster
+  enabled: false
+  # The list of hosts name for your applications
+  # hosts:
+  #  - host: example.com
+  hosts: []
+
+pdb:
+  enabled: false
+  minAvailable: 1
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: "1"
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1.2Gi
+
+managedIdentity:
+#  name:
+#  clientId:
+#  resourceId:
+
+keyVault:
+  # The name of your Azure KeyVault instance
+  name: # starter-kit-key-vault
+
+  # The Resource Group of your Azure KeyVault instance
+  resourceGroup: # Rg-StarterKit-App-USSC-NonProd
+
+  # The Subscription ID of your Azure KeyVault instance
+  subscriptionId: # efede11f-18f5-4297-ac13-1e4582c232ff
+
+  # The Tenant ID of your Azure KeyVault instance
+  tenantId: d1ee1acd-bc7a-4bc4-a787-938c49a83906
+
+secrets:
+  # List the name of the secrets in the Azure KeyVault instance which you want to integrate to AKS
+  keyVaultObjectName: []
+
+  # The AKS secrets definition you want to sync from Azure KeyVault
+  kubernetesObject:
+    # The name of the AKS Secrets
+    - name: # ads-brain-service-postgres-password
+
+      # The type of the AKS Secrets
+      type: # Opaque
+
+      # The contents in AKS secrets objects
+      key:
+        # The key name inside the AKS Secrets
+        - name: # spring.datasource.password
+
+          # The name should be the same with the name of Azure KeyVault Object which you want to sync
+          objectName: # sk-nonprod-postgresql-admin-password

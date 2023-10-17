@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tang-rolebinding-role
+  namespace: maybetang
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tang-reader
+subjects:
+- kind: User
+  name: tang-user
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tang-clusterrole-binding
+roleRef:
+  kind: ClusterRole
+  name: tang-cluster-role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: User
+  name: tang-admin

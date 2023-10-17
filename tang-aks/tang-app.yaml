@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tang-app-deployment
+  namespace: maybetang
+  labels:
+    app: tang-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tang-app
+  template:
+    metadata:
+      labels:
+        app: tang-app
+    spec:
+      serviceAccountName: tang-service-account 
+      volumes:
+        - name: tang-secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: tang-secret-provider
+      containers:
+        - name: tang-app
+          image: enablementacrnonprod.azurecr.io/tang-app-image:1.4
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: mongo-user
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: mongo-password
+            - name: SAP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: tang-secret
+                  key: sap.service.username
+          volumeMounts:
+            - name: tang-secrets-store-inline
+              readOnly: true
+              mountPath: /mnt/secrets-store
+---
+# apiVersion: apps/v1
+# kind: DaemonSet
+# metadata:
+#   name: tang-app-daemonset
+#   namespace: maybetang
+# spec:
+#   selector:
+#     matchLabels:
+#       app: tang-app # This label must match the label in the template below
+#   template:
+#     metadata:
+#       labels:
+#         app: tang-app # This label must match the selector above
+#     spec:
+#       containers:
+#         - name: tang-app
+#           image: enablementacrnonprod.azurecr.io/tang-app-image:1.4
+#           ports:
+#             - containerPort: 3000
+#           env:
+#             - name: MONGO_INITDB_ROOT_USERNAME
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: mongo-secret
+#                   key: mongo-user
+#             - name: MONGO_INITDB_ROOT_PASSWORD
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: mongo-secret
+#                   key: mongo-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tang-app-service
+  namespace: maybetang
+spec:
+  type: NodePort
+  selector:
+    app: tang-app
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 30100
+---
+# apiVersion: batch/v1
+# kind: CronJob
+# metadata:
+#   name: tang-app-cronjob
+#   namespace: maybetang
+# spec:
+#   schedule: "0 0 1 * *" # Cron schedule, runs every 5 minutes
+#   jobTemplate:
+#     spec:
+#       template:
+#         metadata:
+#           labels:
+#             app: tang-app
+#         spec:
+#           containers:
+#             - name: tang-app
+#               image: enablementacrnonprod.azurecr.io/tang-app-image:1.4
+#               command: ["echo", "tang cronjob is running"]
+#               ports:
+#                 - containerPort: 3000
+#               env:
+#                 - name: MONGO_INITDB_ROOT_USERNAME
+#                   valueFrom:
+#                     secretKeyRef:
+#                       name: mongo-secret
+#                       key: mongo-user
+#                 - name: MONGO_INITDB_ROOT_PASSWORD
+#                   valueFrom:
+#                     secretKeyRef:
+#                       name: mongo-secret
+#                       key: mongo-password
+#           restartPolicy: OnFailure # Restart policy for the job

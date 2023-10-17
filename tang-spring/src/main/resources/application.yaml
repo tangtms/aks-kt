@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://enablement-postgres-flex-nonprod.postgres.database.azure.com/dashboard-db-dev?sslmode=require
+    username: enablement-dashboard-identity-dev
+    azure:
+      passwordless-enabled: true
+  jpa:
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+  h2:
+    console:
+      enabled: true
+logging:
+  level:
+    org:
+      springframework:
+        jdbc:
+          core=DEBUG:

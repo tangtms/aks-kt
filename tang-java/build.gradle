@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+group = 'com.tang-java'
+version = '0.0.1'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudAzureVersion', "5.5.0")
+}
+
+dependencies {
+    implementation 'com.azure.spring:spring-cloud-azure-starter-active-directory'
+    implementation 'org.postgresql:postgresql' // PostgreSQL dependency
+    implementation 'com.azure:azure-identity-extensions' // Azure Identity Extensions
+    implementation 'jakarta.persistence:jakarta.persistence-api'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "com.azure.spring:spring-cloud-azure-dependencies:${springCloudAzureVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

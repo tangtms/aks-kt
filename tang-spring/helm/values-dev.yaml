@@ -1,0 +1,21 @@
+# Default values for our project.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+environment: dev
+
+replicaCount: 1
+
+pdb:
+  enabled: false
+  minAvailable: 1
+
+ingress:
+  enabled: false
+
+
+managedIdentity:
+  enabled: true
+  clientId: 57bdf346-443d-4db0-b074-ec598a5f5a85
+  resourceId: /subscriptions/efede11f-18f5-4297-ac13-1e4582c232ff/resourcegroups/Rg-Enablement-App-USSC-NonProd/providers/Microsoft.ManagedIdentity/userAssignedIdentities/enablement-dashboard-identity-dev
+

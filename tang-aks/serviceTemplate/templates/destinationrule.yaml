@@ -1,0 +1,23 @@
+{{- $destinationruleName := "destinationrule" -}}
+{{- range .Values.virtualservices }}
+{{- $namespace := .namespace }}
+{{- range .paths }}
+{{- if .enableStickySession }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: {{ $destinationruleName }}-{{ .serviceName }}
+  namespace: {{ $namespace }}
+spec:
+  host: {{ .serviceName }}.{{ $namespace }}.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpCookie:
+          name: KeepAffinity
+          path: {{ trimSuffix "/" .path }}
+          ttl: 3600s
+{{- end }}
+{{- end }}
+{{- end }}

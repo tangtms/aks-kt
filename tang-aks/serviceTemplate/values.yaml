@@ -1,0 +1,2 @@
+gateways:
+  - nginx-istio-gateway

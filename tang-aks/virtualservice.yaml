@@ -1,0 +1,42 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: tang-virtualservice
+  namespace: maybetang
+spec:
+  hosts:
+  - aks-gateway-kt.foundational.fldigital.xom.cloud
+  gateways:
+  - enablement-istio/enablement-gateway # use clster istio gateway
+  http:
+  - match:
+    - uri:
+        prefix: /tang/
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: tang-app-service # don't forget to have / at the end
+        port:
+          number: 3000
+  - match:
+    - uri:
+        prefix: /tang-spring/ # don't forget to have / at the end
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: tang-spring-service 
+        port:
+          number: 8080
+  - match:
+    - uri:
+        prefix: /tang-entry/  # don't forget to have / at the end
+    rewrite:
+      authority: www.google.com
+      uri: /
+    route:
+    - destination:
+        host: www.google.com  # The external URL you want to route to
+        port:
+          number: 443
